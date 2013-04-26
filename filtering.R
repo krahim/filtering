@@ -146,3 +146,62 @@ filterWfft<- function(timeSeries, filter1) {
 }
 
 ##filterWfft(  c(1,2,3,4,5,-5,-7,-9), c(1,-1))
+
+
+## ;-------------------------------------------------------------------------------
+## ;-------------------------------------------------------------------------------
+## ;;;  The functions  ideal-low-pass-filter-irs
+## ;;;                 ideal-high-pass-filter-irs
+## ;;;                 ideal-band-pass-filter-irs
+## ;;;                 create-least-squares-low-pass-filter
+## ;;;                 triangular-convergence-factors
+## ;;;                 create-dpss-low-pass-filter
+## ;;;                 compose-symmetric-filters
+## ;;;  can be used to create a filter (by which we mean a vector containing
+## ;;;  the filter coefficients).  The first three of these functions
+## ;;;  return a single member of the impulse response sequence for an ideal
+## ;;;  low-pass, high-pass or band-pass filter.  The next three functions
+## ;;;  can be used to create one of the approximations to an ideal low-pass
+## ;;;  filter discussed in Sections 5.8 and 5.9 of the SAPA book.  The
+## ;;;  final function takes any number of symmetric filters of odd length
+## ;;;  and returns the equivalent composite filter.
+## ;-------------------------------------------------------------------------------
+## ;-------------------------------------------------------------------------------
+
+
+idealLowPassFilterIRS <- function(k, W) {
+    ##       "given 
+    ##    [1] k (required)
+    ##        ==> index of member of impulse response sequence (irs)
+    ##            to be calculated (must be an integer)
+    ##    [2] W (required)
+    ##        ==> the cutoff frequency, standardized such that
+    ##             0 < W < 0.5 = Nyquist frequency
+    ## returns
+    ##    [1] kth member of the impulse response sequence
+    ##        for an ideal low-pass filter with cutoff frequency W
+    ## ---
+    ## Note: see Section 5.8 of the SAPA book"
+    ##   ;(assert (and (integerp k) (plusp W) (< W 0.5))
+    ##
+    stopifnot(k %% 1==0)
+    stopifnot(W > 0) ## is integer
+
+    res <- NULL
+    if( k == 0) {
+        res <- 2*W
+    } else {
+        res <- (sin (2 * pi * W * k))/ (pi *  k)
+    }
+    res
+}
+
+## (ideal-low-pass-filter-irs 0 0.1)   ;==> 0.2
+## (ideal-low-pass-filter-irs 1 0.1)   ;==> 0.1870978567577278
+## (ideal-low-pass-filter-irs -1 0.1)  ;==> 0.1870978567577278
+## > idealLowPassFilterIRS(0, 0.1)
+## [1] 0.2
+## > idealLowPassFilterIRS(1, 0.1)
+## [1] 0.1870979
+## > idealLowPassFilterIRS(-1, 0.1)
+## [1] 0.1870979
