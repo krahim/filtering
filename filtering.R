@@ -1,8 +1,21 @@
-library("multitaper")
-source("~/PWLisp/utilities.R")
-source("~/PWLisp/tapers.R")
+## set local paths
 
-dyn.load(paste("~/RLibs/filtering", .Platform$dynlib.ext, sep=""))
+pathToFiles <- "~/PWLisp/"
+pathToLibs <- "~/RLibs/"
+## set to false if no Fortran libs compiled
+useFortranLib <- TRUE
+
+library("multitaper")
+source(paste(pathToFiles, "utilities.R", sep=""))
+source(paste(pathToFiles, "tapers.R", sep=""))
+
+## load dynamic library
+filteringLib <- paste(pathToLibs, "filtering", .Platform$dynlib.ext, sep="")
+dyn.load(filteringLib)
+
+## set to false if no lib compiled
+
+
 
 ## ;;; Note: filter-time-series-direct is primarily intended to be used
 ## ;;; with short filters for which use of fft's would not be effecient.
@@ -28,6 +41,16 @@ dyn.load(paste("~/RLibs/filtering", .Platform$dynlib.ext, sep=""))
 ## ---
 ## Note: result can be the same as time-series"
 
+filterTimeSeriesDirect <- function(timeSeries, theFilter) {
+    res <- NULL
+    if(useFortranLib) {
+        res <- filterTimeSeriesDirectF(timeSeries, theFilter)
+    } else {
+        res <- filterTimeSeriesDirectR(timeSeries, theFilter)
+    }
+    res
+}
+
 filterTimeSeriesDirectR <- function(timeSeries, theFilter) {
     nFilter <- length(theFilter)
     nFilterM1 <- nFilter -1
@@ -45,7 +68,7 @@ filterTimeSeriesDirectR <- function(timeSeries, theFilter) {
     return(list(result=result, nOutput=nOutput))
 }
 
-filterTimeSeriesDirect <- function(timeSeries, theFilter) {
+filterTimeSeriesDirectF <- function(timeSeries, theFilter) {
 
     nFilter <- length(theFilter)
     nTimeSeries <- length(timeSeries)
@@ -81,8 +104,17 @@ filterWfft_old<- function(timeSeries, filter) {
 }    
 
 
+filterWfft <- function(timeSeries, filter1) {
+    res <- NULL
+    if(useFortranLib) {
+        res <- filterWfftF(timeSeries, filter1)
+    } else {
+        res <- filterWfftR(timeSeries, filter1)
+    }
+    res
+}
 
-filterWfftR<- function(timeSeries, filter1) {
+filterWfftR <- function(timeSeries, filter1) {
     ##           K-1
     ##     y_t = Sum g_k x_{t+K-1-k},  t = 0, ..., N-K+1
     ##           k=0
@@ -122,7 +154,7 @@ filterWfftR<- function(timeSeries, filter1) {
     return(list(result=result, nOutput=nResult))
 }    
 
-filterWfft<- function(timeSeries, filter1) {
+filterWfftF <- function(timeSeries, filter1) {
     ##           K-1
     ##     y_t = Sum g_k x_{t+K-1-k},  t = 0, ..., N-K+1
     ##           k=0
