@@ -1,9 +1,6 @@
 ## set local paths
 
-pathToFiles <- "~/PWLisp/"
 pathToLibs <- "~/RLibs/"
-## set to false if no Fortran libs compiled
-useFortranLib <- TRUE
 
 library("multitaper")
 ## load dynamic library
