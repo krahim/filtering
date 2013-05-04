@@ -1,11 +1,13 @@
 ## set local paths
 
+library("PWLISPR")
 pathToLibs <- "~/RLibs/"
 
-library("multitaper")
+##library("multitaper")
 ## load dynamic library
 filteringLib <- paste(pathToLibs, "filtering", .Platform$dynlib.ext, sep="")
 dyn.load(filteringLib)
+useFortranLib <- TRUE
 
 ## set to false if no lib compiled
 
