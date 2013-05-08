@@ -9,7 +9,38 @@ filteringLib <- paste(pathToLibs, "filtering", .Platform$dynlib.ext, sep="")
 dyn.load(filteringLib)
 useFortranLib <- TRUE
 
-## set to false if no lib compiled
+
+##################################################################################################
+## these function will overwrite the ones in PWLISP
+
+## There are two versions, one in R and one in Fortran.
+## The filtering package will overwrite this function and
+## give an option.
+
+filterTimeSeriesDirect <- function(timeSeries, theFilter) {
+    res <- NULL
+    if(useFortranLib) {
+        res <- filterTimeSeriesDirectF(timeSeries, theFilter)
+    } else {
+        res <- filterTimeSeriesDirectR(timeSeries, theFilter)
+    }
+    res
+}
+
+
+filterWfft <- function(timeSeries, filter1) {
+    res <- NULL
+    if(useFortranLib) {
+        res <- filterWfftF(timeSeries, filter1)
+    } else {
+        res <- filterWfftR(timeSeries, filter1)
+    }
+    res
+}
+
+###################################################################################################
+
+## Main functionality follows
 
 
 
@@ -81,3 +112,4 @@ filterWfftF <- function(timeSeries, filter1) {
 
     return(list(result=out$result, nOutput=nResult))
 }
+
